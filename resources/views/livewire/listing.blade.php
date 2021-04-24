@@ -1,10 +1,11 @@
 <div>
+    <x-jet-banner />
     <!-- This example requires Tailwind CSS v2.0+ -->
     <div class="flex flex-col">
         <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div class="w-full flex justify-between sm:px-6 lg:px-8 py-2">
                 <div>
-                    <input type="text" class="p-2 m-2 rounded" placeholder="Search">
+                    <input wire:model="search" type="search" class="p-2 m-2 rounded" placeholder="Search">
                 </div>
                 <div class="m-2 p-2">
                     <x-jet-button wire:click="showCreateModal" class="bg-green-500">Create</x-jet-button>
@@ -36,34 +37,42 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @if (!empty($listings))
-                                @foreach ($listings as $listing)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            {{ $listing->name }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            {{ $listing->address }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            {{ $listing->website }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            {{ $listing->email }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <x-jet-button wire:click="showEditModal({{ $listing->id }})"
-                                                class="bg-green-500">Edit</x-jet-button>
-                                            <x-jet-button wire:click="deleteListing({{ $listing->id }})"
-                                                class="bg-red-500">Delete</x-jet-button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @endif
+                        <tbody class="bg-white divide-y divide-gray-200" wire:loading.class="opacity-50">
+
+                            @forelse ($listings as $listing)
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {{ $listing->name }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {{ $listing->address }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {{ $listing->website }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {{ $listing->email }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <x-jet-button wire:click="showEditModal({{ $listing->id }})"
+                                            class="bg-green-500">Edit</x-jet-button>
+                                        <x-jet-button wire:click="deleteListing({{ $listing->id }})"
+                                            class="bg-red-500">Delete</x-jet-button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        No Results
+                                    </td>
+                                </tr>
+                            @endforelse
                             <!-- More people... -->
                         </tbody>
                     </table>
+                    <div class="m-2 p-2">
+                        {{ $listings->links() }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -166,7 +175,7 @@
         </x-slot>
         <x-slot name="footer">
             @if ($editMode)
-                <x-jet-button>Update</x-jet-button>
+                <x-jet-button wire:click="listingUpdate">Update</x-jet-button>
             @else
                 <x-jet-button wire:click="createLisitng">Create</x-jet-button>
             @endif
